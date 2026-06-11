@@ -390,7 +390,6 @@ setInterval(loadSignals, 300000);
 
 (function tvMode() {
   var ROTATE_MS = 15000, PAUSE_MS = 8000;
-  var FORCE_TV = new URLSearchParams(location.search).get("tv") === "1";
   var paneIds = ["pane1", "pane2", "pane3", "pane4"];
   var cur = 0, timer = null, clockTimer = null, pausedUntil = 0, manualPause = false;
   var btn = document.getElementById("kioskBtn");
@@ -466,7 +465,7 @@ setInterval(loadSignals, 300000);
     else if (e.key === "ArrowRight") { e.preventDefault(); setActive((cur + 1) % paneIds.length); pausedUntil = Date.now() + PAUSE_MS; }
     else if (e.key === "ArrowLeft") { e.preventDefault(); setActive((cur - 1 + paneIds.length) % paneIds.length); pausedUntil = Date.now() + PAUSE_MS; }
   });
-  function onFsChange() { if (inFs()) enterTv(); else if (!FORCE_TV) exitTv(); }
+  function onFsChange() { if (inFs()) enterTv(); else exitTv(); }
   document.addEventListener("fullscreenchange", onFsChange);
   document.addEventListener("webkitfullscreenchange", onFsChange);
   document.addEventListener("mousemove", function() { if (document.body.classList.contains("tv")) pausedUntil = Date.now() + PAUSE_MS; });
@@ -474,22 +473,6 @@ setInterval(loadSignals, 300000);
     var i = e.target && e.target.getAttribute ? e.target.getAttribute("data-i") : null;
     if (i !== null) { setActive(parseInt(i, 10)); pausedUntil = Date.now() + PAUSE_MS; }
   });
-  var pageStamp = null;
-  function designWatch() {
-    fetch("index.html?v=" + Date.now(), { method: "HEAD" })
-      .then(function(r) {
-        var e = r.headers.get("ETag") || r.headers.get("Last-Modified");
-        if (!e) return;
-        if (pageStamp === null) { pageStamp = e; return; }
-        if (e !== pageStamp) location.reload();
-      })
-      .catch(function() {});
-  }
-  if (FORCE_TV) {
-    enterTv();
-    designWatch();
-    setInterval(designWatch, 3600000);
-  }
 })();
 </script>
 </body>
