@@ -475,16 +475,12 @@ function healthScore() {
   D.releases_upcoming.forEach(function(r) {
     if (r.risk === "missed" || r.risk === "failing") {
       if (r.confidence === null || r.confidence === undefined) pen += 10;
-    } else if (r.risk === "at_risk") sum += 40;
+    } else if (r.risk === "at_risk") sum += 50;
     else if (r.risk === "on_track") sum += 100;
     else sum += 60;
     if (r.slippage && r.slippage.postponements) pen += 2 * r.slippage.postponements;
   });
   var base = sum / D.releases_upcoming.length;
-  var S = window.__signals;
-  if (S) S.releases.forEach(function(rel) {
-    (rel.signals || []).forEach(function(sig) { if (sig.level === "red") pen += 8; });
-  });
   return Math.max(0, Math.min(100, Math.round(base - pen)));
 }
 
